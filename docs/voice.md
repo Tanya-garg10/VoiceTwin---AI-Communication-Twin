@@ -1,0 +1,2 @@
+# Voice
+Web Speech API for demo. Agora integration: frontend loads agora-rtc-sdk-ng when VITE_AGORA_APP_ID present, requests token from /api/voice/token. Backend generates RTC token. States mapped to Orb.
