@@ -18,7 +18,7 @@ const savedSessions = JSON.parse(localStorage.getItem('vt_sessions')||'[]')
 export const useStore = create<AppState>((set)=>({
   user: JSON.parse(localStorage.getItem('vt_user')||'null'),
   profile: savedProfile,
-  twin: savedTwin || {personality:'Professional', convStyle:'Conversational', coaching:'Balanced', difficulty:'Intermediate', voice:'Aria'},
+  twin: savedTwin || {personality:'Professional' as const, convStyle:'Conversational', coaching:'Balanced', difficulty:'Intermediate' as const, voice:'Aria'},
   sessions: savedSessions,
   setUser:(user)=>{ localStorage.setItem('vt_user', JSON.stringify(user)); set({user})},
   setProfile:(profile)=>{ localStorage.setItem('vt_profile', JSON.stringify(profile)); set({profile})},

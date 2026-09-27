@@ -5,12 +5,13 @@ export type SessionState = 'IDLE'|'LISTENING'|'THINKING'|'SPEAKING'|'ANALYZING'|
 export interface UserProfile {
   name:string; role:string; experience:'Entry'|'Mid'|'Senior'|'Lead'; goal:string;
   commStyle:string[]; improveAreas:string[]; targetScenario:ScenarioType;
+  preferredLanguage?:string[];
 }
 export interface TwinConfig {
-  personality:TwinPersonality; convStyle:string; coaching:string; difficulty:'Beginner'|'Intermediate'|'Advanced'|'Expert'; voice:string;
+  personality:TwinPersonality; convStyle:string; coaching:string; difficulty:'Beginner'|'Intermediate'|'Advanced'|'Expert'; voice:string; memory?: Record<string, any>;
 }
 export interface Message { id:string; role:'user'|'twin'; text:string; ts:number; score?:number }
 export interface Session {
   id:string; scenario:ScenarioType; title:string; date:string; duration:number; score:number;
-  messages:Message[]; metrics:any; feedback:any;
+  messages:Message[]; metrics:any; feedback:any; isPressure?:boolean;
 }

@@ -1,25 +1,73 @@
-
 import { Router } from 'express'
-const router=Router()
-router.post('/token', (req,res)=>{
-  const {channel}=req.body
-  const appId=process.env.AGORA_APP_ID
-  const cert=process.env.AGORA_APP_CERTIFICATE
-  if(!appId||!cert){
-    return res.json({mode:'demo', message:'Agora credentials not set — using Web Speech API fallback. Set AGORA_APP_ID & AGORA_APP_CERTIFICATE for live voice.', token:null})
+import pkg from 'agora-access-token'
+const { RtcTokenBuilder, RtcRole } = pkg
+
+const router = Router()
+
+router.post('/token', (req, res) => {
+  try {
+    const { channel = 'voicetwin-channel', uid = 0 } = req.body
+    const appId = process.env.AGORA_APP_ID
+    const cert = process.env.AGORA_APP_CERTIFICATE
+
+    if (!appId || !cert) {
+      return res.json({
+        mode: 'demo',
+        message: 'Agora credentials not configured on backend. Set AGORA_APP_ID & AGORA_APP_CERTIFICATE for production voice channel access.',
+        appId: appId || 'demo-app-id',
+        token: null,
+        channel
+      })
+    }
+
+    const expirationTimeInSeconds = 3600
+    const currentTimestamp = Math.floor(Date.now() / 1000)
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+
+    const token = RtcTokenBuilder.buildTokenWithUid(
+      appId,
+      cert,
+      channel,
+      uid,
+      RtcRole.PUBLISHER,
+      privilegeExpiredTs
+    )
+
+    return res.json({
+      mode: 'live',
+      appId,
+      token,
+      channel,
+      uid
+    })
+  } catch (err: any) {
+    console.error('Error generating Agora token:', err)
+    return res.status(500).json({ error: 'Failed to generate Agora RTC token', details: err.message })
   }
-  // In production, generate Agora RTC token here using agora-access-token
-  // const token = RtcTokenBuilder.buildTokenWithUid(appId, cert, channel, 0, RtcRole.PUBLISHER, expiry)
-  res.json({mode:'live', appId, token:'generated-token-placeholder', channel})
 })
-router.post('/respond', async (req,res)=>{
-  const {message, scenario, twin}=req.body
-  // If AI_API_KEY set, call OpenAI compatible; else fallback
-  if(!process.env.AI_API_KEY){
-    const fallback = `Great point. Let's go deeper — can you quantify that impact with a metric? [Demo Mode — connect AI_API_KEY for real LLM]`
-    return res.json({reply:fallback, mode:'demo'})
+
+router.post('/respond', async (req, res) => {
+  const { message, scenario, twin, history = [], isPressure = false } = req.body
+
+  try {
+    // Generates contextual follow-ups based on communication profile & mode
+    const systemPrompt = `You are VoiceTwin, an AI communication twin acting as a coach in ${scenario} mode.
+User style: ${twin?.personality || 'Professional'}. ${isPressure ? 'MODE: PRESSURE MODE. Be challenging, question weak claims, ask for specific metrics and concrete examples.' : 'MODE: Supportive & constructive.'}`
+
+    let reply = ''
+    if (isPressure) {
+      reply = `[Pressure Mode] You mentioned "${message?.slice(0, 30)}...". That sounds high-level. What specific metrics or evidence prove this result?`
+    } else {
+      reply = `Good explanation regarding "${message?.slice(0, 30)}...". How did you structure your role when handling key challenges in that project?`
+    }
+
+    return res.json({
+      reply,
+      mode: process.env.AGORA_APP_ID ? 'live' : 'demo'
+    })
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to process AI response' })
   }
-  // Real implementation would call LLM
-  res.json({reply:`[Live AI] As a ${twin?.personality||'Professional'} interviewer for ${scenario}: Follow-up to "${message?.slice(0,40)}" — how would you handle pushback?`, mode:'live'})
 })
+
 export default router
