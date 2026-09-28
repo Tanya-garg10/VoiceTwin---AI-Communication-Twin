@@ -3,7 +3,7 @@ import {create} from 'zustand'
 import { UserProfile, TwinConfig, Session } from '../types'
 
 interface AppState {
-  user: {email:string}|null
+  user: {email:string, isPremium?:boolean, plan?:string, features?:string[]}|null
   profile: UserProfile|null
   twin: TwinConfig
   sessions: Session[]

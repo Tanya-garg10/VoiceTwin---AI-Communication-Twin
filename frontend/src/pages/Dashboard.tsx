@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { useStore } from '../lib/store'
-import { Mic, Flame, History, Sparkles, User, ArrowRight, Target, Brain, Briefcase, Users, TrendingUp, Clock, Award, Zap, Play, LayoutDashboard, MessageSquare, BarChart3, Settings, ChevronRight, Activity } from 'lucide-react'
+import { Mic, Flame, History, Sparkles, User, ArrowRight, Target, Brain, Briefcase, Users, TrendingUp, Clock, Award, Zap, Play, LayoutDashboard, MessageSquare, BarChart3, Settings, ChevronRight, Activity, Crown } from 'lucide-react'
 
 export default function Dashboard(){
   const profile=useStore(s=>s.profile)
   const sessions=useStore(s=>s.sessions)
   const twin=useStore(s=>s.twin)
+  const user=useStore(s=>s.user)
   const avg = sessions.length? Math.round(sessions.reduce((a,s)=>a+s.score,0)/sessions.length):0
   const totalMinutes = sessions.length? Math.round(sessions.reduce((a,s)=>a+s.duration,0)/60):0
 
@@ -73,8 +74,15 @@ export default function Dashboard(){
               <User size={16} className="text-[#8b7bff]" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium truncate">{profile?.name || 'User'}</div>
-              <div className="text-xs text-zinc-500">Communication Score</div>
+              <div className="text-sm font-medium truncate">{profile?.name || user?.email || 'User'}</div>
+              <div className="text-xs text-zinc-500">
+                {user?.isPremium ? (
+                  <span className="text-amber-400 flex items-center gap-1">
+                    <Crown size={12} />
+                    Premium
+                  </span>
+                ) : 'Free Plan'}
+              </div>
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { useStore } from '../lib/store'
-import { saveProfileToFirebase } from '../lib/firebaseClient'
 import { ScenarioType } from '../types'
 
 export default function Onboarding() {
@@ -21,30 +20,12 @@ export default function Onboarding() {
   const twin = useStore((s) => s.twin)
   const nav = useNavigate()
 
-  const handleCompleteOnboarding = async () => {
+  const handleCompleteOnboarding = () => {
     setProfile(data)
-
-    // Persist profile to Firebase database
-    await saveProfileToFirebase(
-      {
-        name: data.name,
-        role: data.role,
-        experience: data.experience,
-        goal: data.goal,
-        comm_style: data.commStyle,
-        improve_areas: data.improveAreas,
-        target_scenario: data.targetScenario
-      },
-      {
-        personality: twin.personality,
-        conv_style: twin.convStyle,
-        coaching: twin.coaching,
-        difficulty: twin.difficulty,
-        voice: twin.voice,
-        memory: twin.memory || {}
-      }
-    )
-
+    
+    // Save profile to localStorage for persistence
+    localStorage.setItem('vt_profile', JSON.stringify(data))
+    
     nav('/twin')
   }
 

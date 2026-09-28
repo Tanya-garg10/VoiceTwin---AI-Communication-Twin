@@ -7,7 +7,6 @@ import { VoiceWaveform, MinimalVoiceIndicator } from '../components/VoiceWavefor
 import { Message } from '../types'
 import { analyzeText, getNextQuestion, generateFeedback } from '../lib/aiEngine'
 import { useStore } from '../lib/store'
-import { saveSessionToFirebase } from '../lib/firebaseClient'
 import { AgoraVoiceEngine } from '../lib/agoraClient'
 import { Mic, MicOff, PhoneOff, Radio, Volume2, ArrowLeft, Clock, AlertTriangle, MessageSquare } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -176,21 +175,10 @@ export default function VoiceSession() {
     // Save to Zustand store
     addSession(sess)
 
-    // Save to Firebase DB if configured
-    await saveSessionToFirebase(
-      {
-        id: id!,
-        scenario,
-        title: sess.title,
-        context: scenarioData.ctx || {},
-        is_pressure: Boolean(isPressure),
-        score: feedback.overall,
-        duration: timer
-      },
-      messages,
-      feedback.metrics,
-      feedback
-    )
+    // Save session to localStorage for persistence
+    const sessions = JSON.parse(localStorage.getItem('vt_sessions') || '[]')
+    sessions.unshift(sess)
+    localStorage.setItem('vt_sessions', JSON.stringify(sessions))
 
     nav(`/report/${id}`)
   }
