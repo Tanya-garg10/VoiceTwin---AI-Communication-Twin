@@ -8,7 +8,7 @@ const router = Router()
 const users = new Map<string, any>()
 const authSecret = process.env.AUTH_SECRET || crypto.randomBytes(32).toString('hex')
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', async (req: any, res: any) => {
   const { email, password } = req.body
   if (!email || !password) return res.status(400).json({ error: 'Missing fields' })
 
@@ -36,7 +36,7 @@ router.post('/signup', async (req, res) => {
   res.json({ token, user: { email } })
 })
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req: any, res: any) => {
   const { email, password } = req.body
 
   if (firebaseAuth) {

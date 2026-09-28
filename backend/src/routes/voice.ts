@@ -4,7 +4,7 @@ const { RtcTokenBuilder, RtcRole } = pkg
 
 const router = Router()
 
-router.post('/token', (req, res) => {
+router.post('/token', (req: any, res: any) => {
   try {
     const { channel = 'voicetwin-channel', uid = 0 } = req.body
     const appId = process.env.AGORA_APP_ID
@@ -46,7 +46,7 @@ router.post('/token', (req, res) => {
   }
 })
 
-router.post('/respond', async (req, res) => {
+router.post('/respond', async (req: any, res: any) => {
   const { message, scenario, twin, history = [], isPressure = false } = req.body
 
   try {

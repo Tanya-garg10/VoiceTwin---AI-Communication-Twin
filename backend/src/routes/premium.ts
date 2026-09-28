@@ -3,7 +3,7 @@ import express from 'express'
 const router = express.Router()
 
 // Validate OpenAI API key
-router.post('/validate', async (req, res) => {
+router.post('/validate', async (req: any, res: any) => {
   try {
     const { apiKey } = req.body
     
@@ -30,7 +30,7 @@ router.post('/validate', async (req, res) => {
 })
 
 // Get premium features status
-router.get('/features', (req, res) => {
+router.get('/features', (req: any, res: any) => {
   const hasApiKey = !!process.env.OPENAI_API_KEY
   
   res.json({
