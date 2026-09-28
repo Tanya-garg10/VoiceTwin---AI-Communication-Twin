@@ -18,15 +18,11 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
 </p>
 
----
-
 ## ⚡ Overview
 
 **VoiceTwin** is an advanced AI communication coach and simulated interviewer. Whether preparing for high-stakes technical loops (System Design, Staff Architecture, Coding), executive presentations, or salary negotiations, VoiceTwin provides a realistic, spoken dialogue environment that evaluates **not just what you say, but how you say it**.
 
 By pairing **Google Gemini** for reasoning, dynamic follow-up questioning, and speech reframing with **Agora RTC** for ultra-low latency real-time voice streaming, VoiceTwin mimics the conversational cadence and pressure of real interviewers.
-
----
 
 ## ✨ Key Features
 
@@ -53,8 +49,6 @@ By pairing **Google Gemini** for reasoning, dynamic follow-up questioning, and s
 - **Session Transcript & Key Moments**: Full transcript with time-indexed feedback markers.
 - **Actionable Praise & Critique**: Identifies top strengths and precise areas for improvement.
 - **Visual Audio Waves & Orbit Visualizers**: Interactive audio waveforms and reactive 3D voice orbs during speech.
-
----
 
 ## 🏗️ Architecture
 
@@ -91,16 +85,12 @@ By pairing **Google Gemini** for reasoning, dynamic follow-up questioning, and s
                                └──────────────────────────────┘
 ```
 
----
-
 ## 🛠️ Tech Stack
 
 - **Frontend**: [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/), [Tailwind CSS v4](https://tailwindcss.com/), [Motion](https://motion.dev/), [Lucide React](https://lucide.dev/)
 - **Backend**: [Node.js](https://nodejs.org/), [Express](https://expressjs.com/), [tsx](https://github.com/privatenumber/tsx), [dotenv](https://github.com/motdotla/dotenv)
 - **AI Engine**: [@google/genai SDK](https://github.com/google/generative-ai-js) (Model: `gemini-3.8-flash`)
 - **Voice & Real-Time RTC**: [Agora RTC SDK NG](https://www.agora.io/) (`agora-rtc-sdk-ng`, `agora-token`)
-
----
 
 ## 🚀 Getting Started
 
@@ -143,8 +133,6 @@ PORT=3000
 
 > **Note**: If `GEMINI_API_KEY` or Agora credentials are not provided, VoiceTwin includes seamless built-in fallback mock responses and simulated voice modes so you can test the UI and workflows immediately.
 
----
-
 ## 💻 Running the App
 
 ### Development Mode
@@ -160,8 +148,6 @@ npm run build
 npm run start
 ```
 
----
-
 ## 📡 API Endpoints
 
 | Method | Endpoint | Description |
@@ -171,8 +157,6 @@ npm run start
 | `POST` | `/api/interview/question` | Generates role-specific questions with Gemini AI |
 | `POST` | `/api/interview/followup` | Evaluates answer transcript, crutches, and follow-ups |
 | `POST` | `/api/interview/improve-answer` | Polishes raw spoken answer into structured STAR response |
-
----
 
 ## 📁 Project Structure
 
@@ -206,8 +190,6 @@ npm run start
 │       └── ...
 ```
 
----
-
 ## 🤝 Contributing
 
 Contributions, feedback, and feature requests are welcome!
@@ -216,8 +198,6 @@ Contributions, feedback, and feature requests are welcome!
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
----
 
 ## 📄 License
 
