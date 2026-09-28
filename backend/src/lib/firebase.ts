@@ -1,4 +1,5 @@
-import admin from 'firebase-admin'
+// @ts-ignore - Firebase admin types have issues with ES modules
+const admin = require('firebase-admin')
 
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID || '',
@@ -6,7 +7,6 @@ const serviceAccount = {
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL || ''
 }
 
-// @ts-ignore - Firebase admin types have issues with ES modules
 export const firebase = serviceAccount.projectId && serviceAccount.privateKey && serviceAccount.clientEmail
   ? admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
@@ -14,7 +14,5 @@ export const firebase = serviceAccount.projectId && serviceAccount.privateKey &&
     })
   : null
 
-// @ts-ignore
 export const auth = firebase ? admin.auth() : null
-// @ts-ignore
 export const db = firebase ? admin.firestore() : null
