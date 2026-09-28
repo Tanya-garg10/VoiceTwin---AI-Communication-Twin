@@ -15,6 +15,7 @@
   <a href="#tech-stack"><img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript" alt="TypeScript"></a>
   <a href="#tech-stack"><img src="https://img.shields.io/badge/TailwindCSS-v4-38B2AC?logo=tailwind-css" alt="Tailwind CSS"></a>
   <a href="#tech-stack"><img src="https://img.shields.io/badge/Express-4.21-000000?logo=express" alt="Express"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
 </p>
 
 ---
@@ -220,4 +221,5 @@ Contributions, feedback, and feature requests are welcome!
 
 ## 📄 License
 
-This project is licensed under the MIT License - feel free to use and adapt it for your own voice AI projects.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
