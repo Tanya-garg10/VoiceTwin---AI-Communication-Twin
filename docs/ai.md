@@ -1,2 +1,0 @@
-# AI Prompt System
-System prompt generated from profile + twin + scenario + difficulty. Adaptive: if confidence low → supportive. If high → pressure. Response length, STAR enforcement. Fallback bank avoids hallucination.

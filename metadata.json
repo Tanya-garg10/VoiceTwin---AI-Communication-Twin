@@ -1,0 +1,10 @@
+{
+  "name": "VoiceTwin - AI Conversational Interview & Communication Coach",
+  "description": "Real-time conversational voice interview practice, dynamic pressure testing, speech analytics, and personal communication twin powered by Gemini and low-latency RTC.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
