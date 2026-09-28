@@ -11,6 +11,24 @@ dotenv.config()
 const app=express()
 app.use(cors({origin: process.env.FRONTEND_URL||'*'}))
 app.use(express.json())
+
+// Root route
+app.get('/', (_: any, res: any) => {
+  res.json({
+    message: 'VoiceTwin Premium Platform API',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      twin: '/api/twin',
+      sessions: '/api/sessions',
+      voice: '/api/voice',
+      premium: '/api/premium'
+    }
+  })
+})
+
 app.get('/api/health', (_: any, res: any)=>res.json({status:'ok', mode: process.env.AGORA_APP_ID?'live':'demo', platform: 'VoiceTwin - Premium AI Communication Platform'}))
 app.use('/api/auth', authRoutes)
 app.use('/api/twin', twinRoutes)
