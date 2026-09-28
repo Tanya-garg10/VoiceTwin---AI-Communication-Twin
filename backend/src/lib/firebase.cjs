@@ -1,4 +1,4 @@
-// @ts-ignore - Firebase admin types have issues with ES modules
+// @ts-ignore
 const admin = require('firebase-admin')
 
 const serviceAccount = {

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import crypto from 'node:crypto'
-import { auth as firebaseAuth } from '../lib/firebase.js'
+import { auth as firebaseAuth } from '../lib/firebase.cjs'
 
 const router = Router()
 const users = new Map<string, any>()
