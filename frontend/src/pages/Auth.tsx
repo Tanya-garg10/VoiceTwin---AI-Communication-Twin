@@ -15,7 +15,7 @@ export default function Auth(){
   const handleGuestAccess = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/auth/guest', {
+      const response = await fetch('http://localhost:4000/api/auth/guest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })
@@ -36,7 +36,7 @@ export default function Auth(){
     
     setIsLoading(true)
     try {
-      const response = await fetch('/api/auth/api-key', {
+      const response = await fetch('http://localhost:4000/api/auth/api-key', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ apiKey })
