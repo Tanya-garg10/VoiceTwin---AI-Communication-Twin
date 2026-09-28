@@ -1,4 +1,4 @@
-import admin from 'firebase-admin'
+import * as admin from 'firebase-admin'
 
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID || '',
@@ -8,10 +8,10 @@ const serviceAccount = {
 
 export const firebase = serviceAccount.projectId && serviceAccount.privateKey && serviceAccount.clientEmail
   ? admin.initializeApp({
-      credential: (admin as any).credential.cert(serviceAccount),
+      credential: admin.credential.cert(serviceAccount),
       databaseURL: process.env.FIREBASE_DATABASE_URL
     })
   : null
 
-export const auth = firebase ? (admin as any).auth() : null
-export const db = firebase ? (admin as any).firestore() : null
+export const auth = firebase ? admin.auth() : null
+export const db = firebase ? admin.firestore() : null
