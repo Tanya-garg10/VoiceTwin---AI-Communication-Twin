@@ -1,10 +1,6 @@
 # 🎙️ VoiceTwin — AI Communication & Interview Twin
 
 <p align="center">
-  <img src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" alt="VoiceTwin Banner" width="100%" style="max-height: 380px; object-fit: cover; border-radius: 12px;" />
-</p>
-
-<p align="center">
   <strong>Real-time conversational voice interview practice, dynamic pressure testing, speech analytics, and personal communication twin powered by Google Gemini and Agora Low-Latency RTC.</strong>
 </p>
 
