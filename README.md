@@ -1,5 +1,5 @@
 <p align="center">
-   <h1>🎙️ VoiceTwin — AI Communication & Interview Twin</h1>
+🎙️ VoiceTwin — AI Communication & Interview Twin
 </p>
 
 <p align="center">
