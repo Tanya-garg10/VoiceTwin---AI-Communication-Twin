@@ -11,6 +11,7 @@ interface ButtonProps {
   icon?: ReactNode
   iconPosition?: 'left' | 'right'
   onClick?: () => void
+  gradient?: boolean
   [key: string]: any
 }
 
@@ -24,8 +25,11 @@ export function Button({
   icon,
   iconPosition = 'left',
   onClick,
+  gradient,
   ...props 
 }: ButtonProps) {
+  // Handle gradient prop by converting it to variant
+  const finalVariant = gradient ? 'gradient' : variant
   const base = 'inline-flex items-center justify-center rounded-full font-medium transition-all duration-300 relative overflow-hidden'
   
   const variants: Record<string, string> = {
@@ -65,7 +69,7 @@ export function Button({
     <motion.button
       whileTap={{ scale: disabled || loading ? 1 : 0.97 }}
       whileHover={{ scale: disabled || loading ? 1 : 1.02 }}
-      className={`${base} ${variants[variant]} ${sizes[size]} ${disabledClasses} ${className}`}
+      className={`${base} ${variants[finalVariant]} ${sizes[size]} ${disabledClasses} ${className}`}
       onClick={onClick}
       disabled={disabled || loading}
       {...(props as any)}
