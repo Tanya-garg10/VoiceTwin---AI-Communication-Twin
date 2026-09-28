@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { GoogleGenAI, Type } from '@google/genai';
+import OpenAI from 'openai';
 import agoraTokenPkg from 'agora-token';
 
 const { RtcTokenBuilder, RtcRole } = agoraTokenPkg;
@@ -17,17 +17,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
-// Shared Gemini client instance
-const getGeminiClient = () => {
-  const apiKey = process.env.GEMINI_API_KEY;
+// Shared OpenAI client instance
+const getOpenAIClient = () => {
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
-  return new GoogleGenAI({
+  return new OpenAI({
     apiKey,
-    httpOptions: {
-      headers: {
-        'User-Agent': 'aistudio-build',
-      },
-    },
   });
 };
 
@@ -90,13 +85,13 @@ app.post('/api/agora/token', (req, res) => {
   });
 });
 
-// 1. Generate Interview Question
+// 1. Generate Interview Question with OpenAI
 app.post('/api/interview/question', async (req, res) => {
   try {
     const { role = 'Senior Distributed Systems Engineer', topic = 'Kafka & Event-Driven Architecture', difficulty = 'Senior', round = 'Technical Interview' } = req.body;
-    const ai = getGeminiClient();
+    const openai = getOpenAIClient();
 
-    if (!ai) {
+    if (!openai) {
       return res.json({
         question: `How does Apache Kafka handle consumer group rebalancing when a new node joins or an existing consumer crashes, and how do you mitigate stop-the-world partition assignment delays in high-throughput pipelines?`,
         interviewerPersona: 'Sarah Chen, Staff Infrastructure Architect',
@@ -110,37 +105,25 @@ Topic: ${topic}
 Target Difficulty: ${difficulty}
 
 Generate a sharp, realistic, conversational interview question that tests both deep domain knowledge and communication articulation.
-Return JSON with:
+Return JSON with exactly these fields:
 - question: string (conversational, professional, clear)
 - interviewerPersona: string (e.g., "Sarah Chen, Staff Infrastructure Architect")
 - expectedPoints: array of 4 string bullet points
 - intent: string (what the interviewer is testing for)`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            question: { type: Type.STRING },
-            interviewerPersona: { type: Type.STRING },
-            expectedPoints: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING }
-            },
-            intent: { type: Type.STRING }
-          },
-          required: ['question', 'interviewerPersona', 'expectedPoints', 'intent']
-        }
-      }
+    const response = await openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'gpt-4o',
+      messages: [
+        { role: 'system', content: 'You are an elite technical interviewer. Respond strictly with a valid JSON object matching the requested schema.' },
+        { role: 'user', content: prompt }
+      ],
+      response_format: { type: 'json_object' }
     });
 
-    const parsed = JSON.parse(response.text || '{}');
+    const parsed = JSON.parse(response.choices[0]?.message?.content || '{}');
     return res.json(parsed);
   } catch (err: any) {
-    console.error('Error generating question:', err);
+    console.error('Error generating question with OpenAI:', err);
     return res.json({
       question: `How does Apache Kafka handle consumer group rebalancing when a new node joins or an existing consumer crashes, and how do you mitigate stop-the-world partition assignment delays in high-throughput pipelines?`,
       interviewerPersona: 'Sarah Chen, Staff Infrastructure Architect',
@@ -150,13 +133,13 @@ Return JSON with:
   }
 });
 
-// 2. Process Voice Answer and Generate Contextual Follow-Up
+// 2. Process Voice Answer and Generate Contextual Follow-Up with OpenAI
 app.post('/api/interview/followup', async (req, res) => {
   try {
     const { question, transcript, pressureMode = false, role = 'Staff Software Engineer' } = req.body;
-    const ai = getGeminiClient();
+    const openai = getOpenAIClient();
 
-    if (!ai) {
+    if (!openai) {
       const isPressure = Boolean(pressureMode);
       return res.json({
         reaction: isPressure 
@@ -184,51 +167,32 @@ Candidate's Spoken Answer: "${transcript}"
 Mode: ${pressureMode ? 'STRICT PRESSURE MODE (Challenging, rapid, time-sensitive, probing edge cases)' : 'Standard Deep Conversational Round'}
 
 Analyze the candidate's response.
-1. Provide a natural conversational reaction (1-2 sentences).
-2. Ask a sharp, contextual follow-up question based directly on what they just claimed or omitted.
-3. Evaluate their verbal delivery from the transcript:
-   - score clarity (0-100), confidence (0-100), relevance (0-100), conciseness (0-100), technicalDepth (0-100)
-   - list any detected verbal crutches/filler words (e.g. "um", "like", "sort of", "basically")
-   - praise (1 sentence highlight)
-   - critique (1 sentence actionable tip)`;
+Return a valid JSON object with:
+- reaction: natural conversational reaction (1-2 sentences).
+- followUpQuestion: sharp, contextual follow-up question based directly on what they just claimed or omitted.
+- instantFeedback: object with:
+    - clarity: number (0-100)
+    - confidence: number (0-100)
+    - relevance: number (0-100)
+    - conciseness: number (0-100)
+    - technicalDepth: number (0-100)
+    - detectedFillers: array of strings (e.g. ["um", "like", "sort of", "basically"])
+    - praise: string (1 sentence highlight)
+    - critique: string (1 sentence actionable tip)`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            reaction: { type: Type.STRING },
-            followUpQuestion: { type: Type.STRING },
-            instantFeedback: {
-              type: Type.OBJECT,
-              properties: {
-                clarity: { type: Type.NUMBER },
-                confidence: { type: Type.NUMBER },
-                relevance: { type: Type.NUMBER },
-                conciseness: { type: Type.NUMBER },
-                technicalDepth: { type: Type.NUMBER },
-                detectedFillers: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
-                },
-                praise: { type: Type.STRING },
-                critique: { type: Type.STRING }
-              },
-              required: ['clarity', 'confidence', 'relevance', 'conciseness', 'technicalDepth', 'detectedFillers', 'praise', 'critique']
-            }
-          },
-          required: ['reaction', 'followUpQuestion', 'instantFeedback']
-        }
-      }
+    const response = await openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'gpt-4o',
+      messages: [
+        { role: 'system', content: 'You are an expert technical interviewer evaluating spoken responses. Always respond with a valid JSON object.' },
+        { role: 'user', content: prompt }
+      ],
+      response_format: { type: 'json_object' }
     });
 
-    const parsed = JSON.parse(response.text || '{}');
+    const parsed = JSON.parse(response.choices[0]?.message?.content || '{}');
     return res.json(parsed);
   } catch (err: any) {
-    console.error('Error generating follow-up:', err);
+    console.error('Error generating follow-up with OpenAI:', err);
     return res.json({
       reaction: "That highlights the core mechanics well. Let's look at the edge case.",
       followUpQuestion: "What happens when a poison pill message triggers repeated consumer crashes in that group, causing continuous rebalance loops? How do you isolate it?",
@@ -246,13 +210,13 @@ Analyze the candidate's response.
   }
 });
 
-// 3. AI Answer Polisher & Transformation (Weak -> AI Improved STAR/Staff Answer)
+// 3. AI Answer Polisher & Transformation (Weak -> AI Improved STAR/Staff Answer) with OpenAI
 app.post('/api/interview/improve-answer', async (req, res) => {
   try {
     const { question, originalAnswer } = req.body;
-    const ai = getGeminiClient();
+    const openai = getOpenAIClient();
 
-    if (!ai) {
+    if (!openai) {
       return res.json({
         originalScore: 71,
         improvedScore: 96,
@@ -276,7 +240,7 @@ Transform this raw spoken answer into an ultra-high-impact, executive-level tech
 Maintain their core experience, but:
 1. Strip all verbal fluff, circular rambling, and uncertainty words.
 2. Structure with punchy architectural framing (Problem → Solution Protocol → Production Trade-off/Metric).
-3. Return:
+3. Return a valid JSON object with:
    - originalScore: number (0-100)
    - improvedScore: number (90-99)
    - improvedAnswer: string (crisp, spoken-ready, ~80-120 words)
@@ -284,33 +248,19 @@ Maintain their core experience, but:
    - deliveryAdvice: string on pacing, tone, and pause technique
    - twinArchetypeProgress: string (e.g. "+15% toward Staff Communicator")`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            originalScore: { type: Type.NUMBER },
-            improvedScore: { type: Type.NUMBER },
-            improvedAnswer: { type: Type.STRING },
-            keyImprovements: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING }
-            },
-            deliveryAdvice: { type: Type.STRING },
-            twinArchetypeProgress: { type: Type.STRING }
-          },
-          required: ['originalScore', 'improvedScore', 'improvedAnswer', 'keyImprovements', 'deliveryAdvice', 'twinArchetypeProgress']
-        }
-      }
+    const response = await openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'gpt-4o',
+      messages: [
+        { role: 'system', content: 'You are an executive communication coach. Return your response strictly as a JSON object.' },
+        { role: 'user', content: prompt }
+      ],
+      response_format: { type: 'json_object' }
     });
 
-    const parsed = JSON.parse(response.text || '{}');
+    const parsed = JSON.parse(response.choices[0]?.message?.content || '{}');
     return res.json(parsed);
   } catch (err: any) {
-    console.error('Error improving answer:', err);
+    console.error('Error improving answer with OpenAI:', err);
     return res.json({
       originalScore: 71,
       improvedScore: 96,
